@@ -1,0 +1,44 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+
+    <h3>All posts</h3>
+
+
+    {% for post in  posts %}
+     <div class="row post posts">
+     <h5><a href="{% url 'profile' user_id=post.author.id %}">{{ post.author }}</a></h5>
+         <br>
+
+     <p class="content" id="content_{{ post.id }}">{{ post.content }}</p>
+     <p class="date">{{ post.created_at }}
+       {% if  user.is_authenticated %}
+         {% if  user != post.author %}
+             {% if post.id in myLikes %}
+                        <button id="but_{{ post.id }}" class="like" style="color:darkred;" onclick="likes({{ post.id }},{{ myLikes }})">♥</button>
+                    {% else %}
+                        <button id="but_{{ post.id }}" class="like" style="color:gray;" onclick="likes({{ post.id }},{{ myLikes }})">♥</button>
+                    {% endif %}
+         {% endif %}
+    {% endif %}
+     </p>
+    </div>
+     {% endfor %}
+    <div class="page">
+    <nav aria-label="Page navigation example">
+    <ul class="pagination">
+
+    {% if posts.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ posts.previous_page_number }}">Previous</a></li>
+    {% endif %}
+    {% if posts.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ posts.next_page_number }}">Next</a></li>
+    {% endif %}
+
+    </ul>
+    </nav>
+    </div>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+
+    <h3>All posts</h3>
+    {% if user.is_authenticated %}
+    <div class="post">
+       <form action="{% url 'post' %}" method="POST">
+            {% csrf_token %}
+        <p>
+            <strong>New Post</strong>
+        </p>
+        <textarea name="content">
+        </textarea>
+        <button  class="btn btn-light">Post</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% for post in  posts %}
+     <div class="row post posts">
+     <div class="row p">
+     <h5><a href="{% url 'profile' user_id=post.author.id %}">{{ post.author }}</a></h5>
+         <br>
+     {% if  user.is_authenticated %}
+         {% if  user == post.author %}
+             <button class="btn btn-light edit" data-toggle="modal" data-target="#modal_edit_post_{{ post.id }}">edit</button>
+            <div class="modal" tabindex="-1" role="dialog" id="modal_edit_post_{{ post.id }}" aria-labelledby="modal_edit_post_{{ post.id }}_label" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Edit Post</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                          <textarea name="text" id="textarea_{{ post.id }}" class="form-control" cols="30" rows="5">{{post.content }}</textarea>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-dismiss="modal" onclick="submit({{ post.id }})">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+
+         {% endif %}
+     {% endif %}
+     </div>
+     <p class="content" id="content_{{ post.id }}">{{ post.content }}</p>
+     <p class="date">{{ post.created_at }}
+    {% if  user.is_authenticated %}
+         {% if  user != post.author %}
+             {% if post.id in myLikes %}
+                        <button id="but_{{ post.id }}" class="like" style="color:darkred;" onclick="likes({{ post.id }},{{ myLikes }})">♥</button>
+                    {% else %}
+                        <button id="but_{{ post.id }}" class="like" style="color:gray;" onclick="likes({{ post.id }},{{ myLikes }})">♥</button>
+                    {% endif %}
+         {% endif %}
+    {% endif %}
+     </p>
+
+    </div>
+     {% endfor %}
+    <div class="page">
+    <nav aria-label="Page navigation example">
+    <ul class="pagination">
+
+    {% if posts.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ posts.previous_page_number }}">Previous</a></li>
+    {% endif %}
+    {% if posts.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ posts.next_page_number }}">Next</a></li>
+    {% endif %}
+
+    </ul>
+    </nav>
+    </div>
+{% endblock %}
